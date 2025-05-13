@@ -1,0 +1,56 @@
+#include <DHT.h>
+#include <LiquidCrystal.h>
+
+// DHT Sensor setup
+#define DHTPIN 2          // DHT11 data pin connected to D2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+// LCD setup (RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
+// Motor Driver Pins
+#define IN1 3
+#define IN2 4
+
+void setup() {
+  // Initialize LCD
+  lcd.begin(16, 2);
+  lcd.print("System Starting");
+
+  // Initialize motor pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+
+  // Initialize DHT sensor
+  dht.begin();
+
+  delay(2000);  // Wait 2 seconds before starting
+  lcd.clear();
+}
+
+void loop() {
+  float temperature = dht.readTemperature();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperature);
+  lcd.print((char)223); // Degree symbol
+  lcd.print("C ");
+
+  if (temperature > 34.0) {
+    // Turn on BO motor (rotate in one direction)
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    lcd.setCursor(0, 1);
+    lcd.print("Motor: ON ");
+  } else {
+    // Turn off motor
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    lcd.setCursor(0, 1);
+    lcd.print("Motor: OFF");
+  }
+
+  delay(2000); // Update every 2 seconds
+}
